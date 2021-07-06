@@ -38,7 +38,7 @@ public class FXMLController {
     private Button btnAnalisi; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxArco"
-    private ComboBox<?> boxArco; // Value injected by FXMLLoader
+    private ComboBox<Adiacenza> boxArco; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnPercorso"
     private Button btnPercorso; // Value injected by FXMLLoader
@@ -48,7 +48,20 @@ public class FXMLController {
 
     @FXML
     void doCalcolaPercorso(ActionEvent event) {
-
+    	
+    	txtResult.clear();
+    	
+    	Adiacenza a = this.boxArco.getValue();
+    	if(a == null) {
+    		txtResult.setText("Seleziona un arco");
+    		return;
+    	}
+    	
+    	List<String> percorso = this.model.trovaPercorso(a.getT1(), a.getT2());
+    	txtResult.appendText("PERCORSO TRA " + a.getT1() + " e " + a.getT2() + ":\n\n");
+    	for(String s : percorso) {
+    		txtResult.appendText(s+"\n");
+    	}
     }
 
     @FXML
@@ -72,15 +85,14 @@ public class FXMLController {
     	
     	this.txtResult.appendText("vertici : "+ this.model.getNVertici()+ " archi: "+this.model.getNArchi()+"\n");
     	
-    	if(this.model.getArchiFiltrati() == null)  {
-    		this.txtResult.appendText("grafo inesistente " +"\n");
-    		return;
-    	}
-    		
-    	for(Adiacenza ad : this.model.getArchiFiltrati()) {
+    	List<Adiacenza> archiFiltrati = this.model.getArchiFiltrati();
+    	
+    	for(Adiacenza ad : archiFiltrati) {
     		
     		this.txtResult.appendText(ad.toString()+"\n");
     	}
+    	this.boxArco.getItems().clear();
+    	this.boxArco.getItems().addAll(archiFiltrati);
     	
     }
 

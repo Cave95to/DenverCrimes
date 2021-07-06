@@ -14,6 +14,9 @@ public class Model {
 	private SimpleWeightedGraph<String,DefaultWeightedEdge> grafo;
 	private EventsDao dao;
 	
+	// ricorsione cammino piu lungo
+	private List<String> percorsoMigliore;
+	
 	public Model() {
 		dao = new EventsDao();
 	}
@@ -87,5 +90,43 @@ public class Model {
 		return null;
 		
 	}
-
+	
+	// devo trovare percorso piu lungo USO RICORSIONE
+	public List<String> trovaPercorso(String sorgente, String destinazione) {
+		
+		this.percorsoMigliore = new ArrayList<>();
+		
+		List<String> parziale = new ArrayList<>();
+		parziale.add(sorgente);
+		
+		this.cerca(destinazione, parziale);
+		
+		return this.percorsoMigliore;
+		
+	}
+	
+	private void cerca(String destinazione, List<String> parziale) {
+		
+		// caso terminale
+		if(parziale.get(parziale.size()-1).equals(destinazione)) {
+			
+			if(parziale.size()>this.percorsoMigliore.size())
+				// FONDAMENTALE RICORDARSI DI FARE LA NEW
+				this.percorsoMigliore = new ArrayList<>(parziale);
+			
+			return;
+		}
+		
+		// altrimenti scorro i vicini dell'ultimo inserito e provo 1 a 1 ad aggiungere
+		
+		for (String vicino : Graphs.neighborListOf(this.grafo, parziale.get(parziale.size()-1))) {
+			
+			if(!parziale.contains(vicino)) { // DEVO EVITARE CICLI!!!
+				parziale.add(vicino);
+				this.cerca(destinazione, parziale);
+				parziale.remove(parziale.size()-1);
+			}
+		}
+	}
+	
 }
