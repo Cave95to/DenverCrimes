@@ -5,8 +5,12 @@
 package it.polito.tdp.crimes;
 
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 import java.util.ResourceBundle;
 
+
+import it.polito.tdp.crimes.model.Adiacenza;
 import it.polito.tdp.crimes.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,10 +29,10 @@ public class FXMLController {
     private URL location;
 
     @FXML // fx:id="boxCategoria"
-    private ComboBox<?> boxCategoria; // Value injected by FXMLLoader
+    private ComboBox<String> boxCategoria; // Value injected by FXMLLoader
 
     @FXML // fx:id="boxMese"
-    private ComboBox<?> boxMese; // Value injected by FXMLLoader
+    private ComboBox<Integer> boxMese; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnAnalisi"
     private Button btnAnalisi; // Value injected by FXMLLoader
@@ -49,7 +53,35 @@ public class FXMLController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-
+    	
+    	txtResult.clear();
+    	
+    	String s = this.boxCategoria.getValue();
+    	if(s == null) {
+    		txtResult.setText("Seleziona una categoria di crimine");
+    		return;
+    	}
+    	
+    	Integer a = this.boxMese.getValue();
+    	if(a == null) {
+    		txtResult.setText("Seleziona un mese");
+    		return;
+    	}
+    	
+    	this.model.creaGrafo(s,a);
+    	
+    	this.txtResult.appendText("vertici : "+ this.model.getNVertici()+ " archi: "+this.model.getNArchi()+"\n");
+    	
+    	if(this.model.getArchiFiltrati() == null)  {
+    		this.txtResult.appendText("grafo inesistente " +"\n");
+    		return;
+    	}
+    		
+    	for(Adiacenza ad : this.model.getArchiFiltrati()) {
+    		
+    		this.txtResult.appendText(ad.toString()+"\n");
+    	}
+    	
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -65,5 +97,11 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	List<String> categorie = this.model.getCategorie();
+    	Collections.sort(categorie);
+    	this.boxCategoria.getItems().addAll(categorie);
+    	List<Integer> mesi = this.model.getMesi();
+    	Collections.sort(mesi);
+    	this.boxMese.getItems().addAll(mesi);
     }
 }
